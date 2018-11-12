@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Board v-if="champions" :champions = "champions"/>
-    {{getRandomChampions}}
+    <Board v-if="randomChamps" :champions = "randomChamps"/>
+  
   </div>
 </template>
 
@@ -15,25 +15,21 @@ export default {
   },
   data: () => ({
     champions: [],
+    randomChamps: [],
     boardSize: 16
   }),
   mounted: function() {
     this.getChampions();
   },
-  computed: {
-    getRandomChampions: function() {
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
-      }
+  watch: {
+    champions: function() {
       let nbChampions = this.champions.length;
-      let selectedChampions = [];
       for (let i; i < this.boardSize; i++) {
-        let rand = getRandomInt(nbChampions);
-        selectedChampions.push(this.champions[rand]);
+        let rand = Math.floor(Math.random() * Math.floor(nbChampions));
+        this.randomChamps.push(this.champions[rand]);
         this.champions.slice(rand, rand + 1);
         --nbChampions;
       }
-      return selectedChampions;
     }
   },
   methods: {
@@ -43,6 +39,15 @@ export default {
         .then(response => {
           for (let champion in response.data) {
             this.champions.push(response.data[champion]);
+          }
+        })
+        .then(() => {
+          let nbChampions = this.champions.length;
+          for (let i = 0; i < this.boardSize; i++) {
+            let rand = Math.floor(Math.random() * Math.floor(nbChampions));
+            this.randomChamps.push(this.champions[rand]);
+            this.champions.slice(rand, rand + 1);
+            --nbChampions;
           }
         })
         .catch(new Error("hello"));

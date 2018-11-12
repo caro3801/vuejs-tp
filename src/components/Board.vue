@@ -16,6 +16,7 @@ export default {
   props: {
     champions: Array
   },
+
   methods: {
     created() {
       console.log("hello");
