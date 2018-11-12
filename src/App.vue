@@ -1,17 +1,52 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Board v-if="champions" :champions = "champions"/>
+    {{getRandomChampions}}
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import Board from "@/components/Board.vue";
 
 export default {
   name: "app",
   components: {
-    HelloWorld
+    Board
+  },
+  data: () => ({
+    champions: [],
+    boardSize: 16
+  }),
+  mounted: function() {
+    this.getChampions();
+  },
+  computed: {
+    getRandomChampions: function() {
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
+      let nbChampions = this.champions.length;
+      let selectedChampions = [];
+      for (let i; i < this.boardSize; i++) {
+        let rand = getRandomInt(nbChampions);
+        selectedChampions.push(this.champions[rand]);
+        this.champions.slice(rand, rand + 1);
+        --nbChampions;
+      }
+      return selectedChampions;
+    }
+  },
+  methods: {
+    getChampions: function() {
+      fetch("champions.json")
+        .then(response => response.json())
+        .then(response => {
+          for (let champion in response.data) {
+            this.champions.push(response.data[champion]);
+          }
+        })
+        .catch(new Error("hello"));
+    }
   }
 };
 </script>
