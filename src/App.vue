@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <Board v-if="randomChamps" :champions = "randomChamps"/>
-  
+       <b-form-select v-model="boardSize" :options="options" class="mb-3">
+    </b-form-select>
+    <!-- <div>Selected: <strong>{{ boardSize }}</strong></div> -->
+    <Board v-if="randomChamps" :champions="randomChamps" :size="boardSize"/>
   </div>
 </template>
 
@@ -15,21 +17,20 @@ export default {
   },
   data: () => ({
     champions: [],
+    options: [
+      { value: 8, text: "8 elements" },
+      { value: 12, text: "12 elements" },
+      { value: 16, text: "16 elements" }
+    ],
     randomChamps: [],
-    boardSize: 16
+    boardSize: 12
   }),
   mounted: function() {
     this.getChampions();
   },
   watch: {
-    champions: function() {
-      let nbChampions = this.champions.length;
-      for (let i; i < this.boardSize; i++) {
-        let rand = Math.floor(Math.random() * Math.floor(nbChampions));
-        this.randomChamps.push(this.champions[rand]);
-        this.champions.slice(rand, rand + 1);
-        --nbChampions;
-      }
+    boardSize: function() {
+      this.randomChamps = this.randomChamps.slice(0, this.boardSize);
     }
   },
   methods: {
@@ -43,10 +44,25 @@ export default {
         })
         .then(() => {
           let nbChampions = this.champions.length;
-          for (let i = 0; i < this.boardSize; i++) {
+          for (let i = 0; i < this.boardSize / 2; i++) {
             let rand = Math.floor(Math.random() * Math.floor(nbChampions));
-            this.randomChamps.push(this.champions[rand]);
-            this.champions.slice(rand, rand + 1);
+            let currentChamp = this.champions[rand];
+            this.randomChamps.push({
+              key: currentChamp.key + "_0",
+              id: currentChamp.id,
+              name: currentChamp.name,
+              img: currentChamp.key + "_0.jpg",
+              flipped: true
+            });
+            this.randomChamps.push({
+              key: currentChamp.key + "_1",
+              id: currentChamp.id,
+              name: currentChamp.name,
+              img: currentChamp.key + "_1.jpg",
+              flipped: true
+            });
+
+            this.champions.splice(rand, 1);
             --nbChampions;
           }
         })

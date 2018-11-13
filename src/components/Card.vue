@@ -1,15 +1,13 @@
 <template>
-<b-card img-src="https://picsum.photos/600/300/?image=25"
+<b-card :img-src="'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/'+src"
           img-alt="Image"
           img-top
-          tag="article"
-          style="max-width: 20rem;"
+          style="max-width: 18rem;"
           class="mb-2">
                 <a class="thumbnail" href="#">
-                    <img class="img-responsive" :src="src" alt="">
-                    <div class="champName">{{championName}}</div> 
+                    <div class="champName">{{name}}</div> 
                 </a>
-            </b-card>
+</b-card>
 </template>
 
 
@@ -18,7 +16,7 @@ export default {
   name: "Card",
   props: {
     src: String,
-    championName: String
+    name: String
   }
 };
 </script>
