@@ -1,9 +1,16 @@
 <template>
   <div id="app">
+      <b-navbar toggleable="md" type="dark" variant="dark" fixed="top">
+      
+  <b-navbar-brand href="#">Memo VueJS</b-navbar-brand>
+</b-navbar>
+<b-container fluid>
+
        <b-form-select v-model="boardSize" :options="options" class="mb-3">
     </b-form-select>
     <!-- <div>Selected: <strong>{{ boardSize }}</strong></div> -->
     <Board v-if="randomChamps" :champions="randomChamps" :size="boardSize"/>
+</b-container>
   </div>
 </template>
 
@@ -23,7 +30,7 @@ export default {
       { value: 16, text: "16 elements" }
     ],
     randomChamps: [],
-    boardSize: 12
+    boardSize: 16
   }),
   mounted: function() {
     this.getChampions();
@@ -46,7 +53,7 @@ export default {
           let nbChampions = this.champions.length;
           for (let i = 0; i < this.boardSize / 2; i++) {
             let rand = Math.floor(Math.random() * Math.floor(nbChampions));
-            let currentChamp = this.champions[rand];
+            let currentChamp = this.champions.splice(rand, 1)[0];
             this.randomChamps.push({
               key: currentChamp.key + "_0",
               id: currentChamp.id,
@@ -62,11 +69,18 @@ export default {
               flipped: true
             });
 
-            this.champions.splice(rand, 1);
             --nbChampions;
           }
+          this.randomChamps = this.shuffle(this.randomChamps);
         })
         .catch(new Error("hello"));
+    },
+    shuffle(a) {
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
     }
   }
 };

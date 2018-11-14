@@ -2,7 +2,7 @@
 
     <div class="row" >
            
-           <Card v-for="card in champions" :key="card.key" :src="card.img" :name="card.name"/>
+           <Card v-for="(card,index) in champions" :key="index" :src="card.img" :name="card.name" :isFlipped="card.flipped" v-on:click.native="handleClick(index,card.key,card.id)"/>
          
         </div>    
 </template>  
@@ -19,39 +19,36 @@ export default {
     size: Number
   },
   data: () => ({
-    cards: []
+    firstCardFlippedId: null,
+    secondCardFlippedId: null
   }),
-
   methods: {
-    initDeck() {},
     flipSelectedCard(cardPosition) {
-      let flippedChampion = {
-        ...this.state.champions[cardPosition],
-        flipped: !this.state.champions[cardPosition].flipped
-      };
-      let champs = this.state.champions;
-      champs.splice(cardPosition, 1, flippedChampion);
-      return champs;
+      this.champions[cardPosition].flipped = !this.champions[cardPosition]
+        .flipped;
     },
-    handleClick(cardPosition, event) {
-      if (this.state.firstCardFlipped === null) {
-        let champs = this.flipSelectedCard(cardPosition);
-        this.setState({ champions: champs, firstCardFlipped: cardPosition });
+    handleClick: function(index, key, id) {
+      if (this.firstCardFlippedId == null) {
+        this.firstCardFlippedId = { key, id, index };
+        this.flipSelectedCard(index);
       } else if (
-        this.state.secondCardFlipped === null &&
-        this.state.firstCardFlipped !== cardPosition
+        this.secondCardFlippedId == null &&
+        this.firstCardFlippedId.key != key
       ) {
-        let champs = this.flipSelectedCard(cardPosition);
-        this.setState({ champions: champs, secondCardFlipped: cardPosition });
-        setTimeout(this.hideCardsWhenDifferent.bind(this), 1000);
+        this.secondCardFlippedId = { key, id, index };
+        this.flipSelectedCard(index);
+        setTimeout(this.hideCardsWhenDifferent, 1000);
       }
     },
-    shuffle(a) {
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+    hideCardsWhenDifferent: function() {
+      if (this.secondCardFlippedId.id !== this.firstCardFlippedId.id) {
+        this.champions[this.firstCardFlippedId.index].flipped = !this
+          .firstCardFlippedId.flipped;
+        this.champions[this.secondCardFlippedId.index].flipped = !this
+          .secondCardFlippedId.flipped;
       }
-      return a;
+      this.firstCardFlippedId = null;
+      this.secondCardFlippedId = null;
     }
   }
 };
